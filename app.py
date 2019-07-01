@@ -1,46 +1,38 @@
-from flask import Flask, request, jsonify
-import json
+from flask import Flask, jsonify, request, render_template
 
 app = Flask(__name__)
 
-stores = []
+people = []
 
-# GET '/store/<string:name>'
-@app.route('/store/<string:name>')
-def get_store(name):
-    for store in stores :
-        if store["name"]== name:
-            return(jsonify(store))
-    return(jsonify({"message":"store not found!"}))
-
-#POST '/store' data {"name"}
-@app.route('/store', methods=["POST"])
-def create_store():
+@app.route('/person', methods=["POST"])
+def create_person():
     data = request.get_json()
-    stores.append({"name":data["name"], "items":[]})
-    return(jsonify({"message":"store is created"}))
+    people.append({"name":data["name"], "family":data["family"], "properties":[]})
+    return(jsonify({"message":"Person is created"}))
 
-# GET '/store/<string:name>/item/<string:item_name>'
-@app.route('/store/<string:name>/item/<string:item_name>')
-def get_item_in_store(name, item_name):
-    for store in stores:
-        if store["name"]== name:
-            for item in store["items"]:
-                if item["name"] == item_name:
-                    return(jsonify(item))
-    return(jsonify({"message":"Item or store not found"}))
-# POST '/store/<string:name>/item' data {"name", "price"}
-@app.route('/store/<string:name>/item', methods=["POST"])
-def create_item_in_store(name):
+@app.route('/persons')
+def all_people():
+    return jsonify({"people":people})
+
+@app.route('/person/<string:name>/property', methods=["POST"])
+def add_property(name):
     data = request.get_json()
-    for store in stores :
-        if store["name"] == name:
-            store["items"].append({"name": data["name"], "price": data["price"]})
-            return(jsonify({"message":"item added"}))
-    return(jsonify({"message":"store not found"}))
-#  GET '/stores'
-@app.route('/stores')
-def show_stores():
-    return(jsonify({"stores":stores}))
+    for person in people:
+        if person["name"] == name:
+            person["properties"].append({"name":data["name"], "price": data["price"]})
+            return(jsonify({"message": "property added to person"}))
+    return(jsonify({"message":"person was not found"}))
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.run(port = 5000)
