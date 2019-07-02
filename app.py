@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, request, render_template
+from person import *
 
 app = Flask(__name__)
 
@@ -22,6 +23,13 @@ def add_property(name):
             person["properties"].append({"name":data["name"], "price": data["price"]})
             return(jsonify({"message": "property added to person"}))
     return(jsonify({"message":"person was not found"}))
+@app.route('/older', methods =["POST"])
+def show_older_person():
+    data = request.get_json()
+    first_person = Person(data["name1"], data["age1"])
+    second_person = Person(data["name2"], data["age2"])
+    older_person = Person.older(first_person, second_person)
+    return(jsonify({"older person name":older_person.name , "older person age":older_person.age }))
 
 
 
